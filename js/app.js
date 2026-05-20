@@ -605,7 +605,7 @@ function bindEvents() {
 }
 
 function handleClick(e) {
-  const target = e.target.closest("[data-action], [data-scenario-id]");
+  const target = e.target.closest("[data-action], [data-scenario-id], [data-module]");
   if (!target) { bindEvents(); return; }
 
   const action = target.dataset.action;
