@@ -599,9 +599,9 @@ function generateQuizQuestions(scenario) {
     scenarioId: scenario.id,
     question: `拜访「${scenario.name}」客户，首先应该确认哪方面的现状？`,
     options: shuffle([
-      { text: m.keyQuestions[0].substring(0, 35) + "...", correct: true },
+      { text: m.keyQuestions[0], correct: true },
       ...SCENARIOS.filter(s => s.id !== scenario.id)
-        .map(s => s.modules.keyQuestions[0].substring(0, 35) + "...")
+        .map(s => s.modules.keyQuestions[0])
         .slice(0, 3)
         .map(t => ({ text: t, correct: false }))
     ]),
