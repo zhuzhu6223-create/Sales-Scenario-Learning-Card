@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>遨海百词斩 · 海事通信专业词汇</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;
+  --bg-page:#f7f8fa;
+  --bg-card:#ffffff;
+  --bg-hover:#f2f4f7;
+  --bg-surface:#f0f2f5;
+  --border:#e5e7eb;
+  --border-hover:#d1d5db;
+  --border-active:#9db8d6;
+  --text:#1a1a2e;
+  --text-secondary:#4a5568;
+  --text-muted:#9ca3af;
+  --accent:#1a5fb4;
+  --accent-light:#e8f0fe;
+  --accent-mid:#3a7bd5;
+  --green:#16a34a;
+  --green-light:#f0fdf4;
+  --green-border:#bbf7d0;
+  --red:#dc2626;
+  --red-light:#fef2f2;
+  --red-border:#fecaca;
+  --font-cn:'Noto Sans SC',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --radius:8px;
+  --radius-lg:12px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-hover:0 4px 12px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.04);
+  --transition:0.18s ease;
+}
+html{font-size:16px}
+body{font-family:var(--font-cn);background:var(--bg-page);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+.app{max-width:520px;margin:0 auto;padding:16px 16px 80px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 14px;margin-bottom:4px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:var(--radius);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;letter-spacing:-1px}
+.brand-text h1{font-size:18px;font-weight:700;color:var(--text);line-height:1.2}
+.brand-text p{font-size:12px;color:var(--text-muted);margin-top:1px}
+.header-stats{display:flex;gap:14px;font-size:12px;color:var(--text-muted)}
+.header-stats span{display:flex;align-items:center;gap:4px}
+.header-stats b{color:var(--text);font-weight:600;font-size:14px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}.dot.g{background:var(--green)}.dot.r{background:var(--red)}
+.progress-bar{height:4px;background:var(--bg-surface);border-radius:2px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-mid));border-radius:2px;transition:width 0.5s ease;width:0%}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:18px}
+.tab{padding:10px 4px 9px;text-align:center;cursor:pointer;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);transition:var(--transition);position:relative}
+.tab:hover{background:var(--bg-hover);border-color:var(--border-hover)}
+.tab.active{border-color:var(--accent);background:var(--accent-light)}
+.tab-icon{font-size:16px;display:block;margin-bottom:3px;color:var(--text-muted)}.tab.active .tab-icon{color:var(--accent)}
+.tab-label{font-size:11px;color:var(--text-muted);font-weight:400}.tab.active .tab-label{color:var(--accent);font-weight:500}
+.filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.chip{padding:5px 14px;font-size:12px;border-radius:999px;cursor:pointer;background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted);transition:var(--transition);font-family:var(--font-cn)}
+.chip:hover{border-color:var(--border-hover);color:var(--text-secondary)}
+.chip.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:500}
+.view{display:none}.view.active{display:block}
+.flashcard{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;min-height:280px;cursor:pointer;transition:var(--transition);box-shadow:var(--shadow)}
+.flashcard:hover{box-shadow:var(--shadow-hover);border-color:var(--border-hover)}
+.flashcard:active{transform:scale(0.995)}
+.card-badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:999px;margin-bottom:16px;background:var(--accent-light);color:var(--accent);font-weight:500}
+.card-cn{font-size:30px;font-weight:700;letter-spacing:-0.3px;line-height:1.2;margin-bottom:8px;color:var(--text)}
+.card-en{font-family:var(--font-mono);font-size:14px;color:var(--text-muted);font-weight:400}
+.card-fullname{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:3px}
+.card-hint{margin-top:28px;font-size:12px;color:var(--text-muted);letter-spacing:0.3px}
+.card-back{display:none}
+.detail-section{margin-bottom:14px}.detail-section:last-child{margin-bottom:0}
+.detail-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);margin-bottom:4px;font-weight:500}
+.detail-content{font-size:14px;line-height:1.75;color:var(--text-secondary)}
+.detail-module{display:inline-block;font-size:12px;padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-secondary);margin-top:2px}
+.card-counter{text-align:center;font-size:12px;color:var(--text-muted);margin:12px 0 8px;font-family:var(--font-mono)}
+.card-nav{display:flex;gap:8px}
+.nav-btn{flex:1;padding:11px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--text-secondary);font-family:var(--font-cn);transition:var(--transition)}
+.nav-btn:hover:not(:disabled){background:var(--bg-hover);border-color:var(--border-hover);color:var(--text)}
+.nav-btn:disabled{opacity:0.35;cursor:not-allowed}
+.mastery-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.m-btn{padding:11px;border-radius:var(--radius);cursor:pointer;font-size:13px;font-family:var(--font-cn);transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:5px;font-weight:500}
+.m-btn.unknown{background:var(--red-light);border:1px solid var(--red-border);color:var(--red)}.m-btn.unknown:hover{background:#fee2e2}
+.m-btn.known{background:var(--green-light);border:1px solid var(--green-border);color:var(--green)}.m-btn.known:hover{background:#dcfce7}
+.quiz-stem{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px;box-shadow:var(--shadow)}
+.quiz-num{font-size:11px;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-mono)}
+.quiz-q{font-size:15px;line-height:1.7;color:var(--text)}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.quiz-opt{padding:13px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;display:flex;align-items:center;gap:12px;transition:var(--transition);font-family:var(--font-cn);color:var(--text);box-shadow:var(--shadow)}
+.quiz-opt:hover:not(.disabled){background:var(--bg-hover);border-color:var(--border-hover)}
+.quiz-opt .letter{width:26px;height:26px;border-radius:50%;flex-shrink:0;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;background:var(--bg-surface);color:var(--text-secondary);font-family:var(--font-mono)}
+.quiz-opt .opt-en{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-left:4px}
+.quiz-opt.correct{background:var(--green-light);border-color:var(--green-border)}.quiz-opt.correct .letter{background:var(--green);color:white}
+.quiz-opt.wrong{background:var(--red-light);border-color:var(--red-border)}.quiz-opt.wrong .letter{background:var(--red);color:white}
+.quiz-opt.disabled{cursor:default;pointer-events:none}
+.quiz-feedback{padding:14px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;line-height:1.6;color:var(--text-secondary);margin-bottom:12px;display:none}
+.quiz-result{display:none}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:var(--shadow)}
+.stat-card .stat-label{font-size:11px;color:var(--text-muted)}.stat-card .stat-val{font-size:22px;font-weight:700;margin-top:4px;font-family:var(--font-mono)}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-primary{flex:1;padding:12px;border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:500;background:var(--accent);color:white;border:none;font-family:var(--font-cn);transition:var(--transition)}.btn-primary:hover{background:var(--accent-mid)}
+.daily-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.daily-title{font-size:16px;font-weight:600;color:var(--text)}.daily-date{font-size:11px;color:var(--text-muted);margin-top:1px;font-family:var(--font-mono)}
+.daily-refresh{padding:7px 14px;font-size:12px;border-radius:var(--radius);cursor:pointer;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);font-family:var(--font-cn);transition:var(--transition)}.daily-refresh:hover{background:var(--bg-hover);border-color:var(--border-hover)}
+.daily-list{display:flex;flex-direction:column;gap:8px}
+.daily-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:var(--transition);box-shadow:var(--shadow);position:relative}
+.daily-item:hover{box-shadow:var(--shadow-hover);border-color:var(--border-hover)}
+.daily-item::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--accent);border-radius:0 2px 2px 0;opacity:0;transition:var(--transition)}.daily-item:hover::before{opacity:1}
+.daily-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:5px}
+.daily-cn{font-size:15px;font-weight:600;color:var(--text)}.daily-en{font-family:var(--font-mono);font-size:12px;color:var(--text-muted)}
+.daily-def{font-size:13px;color:var(--text-muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.daily-note{text-align:center;font-size:11px;color:var(--text-muted);margin-top:12px}
+.m-tabs{display:flex;gap:0;margin-bottom:14px;background:var(--bg-surface);border-radius:var(--radius);padding:3px;border:1px solid var(--border)}
+.m-tab{flex:1;padding:8px;font-size:12px;text-align:center;cursor:pointer;border-radius:6px;color:var(--text-muted);transition:var(--transition);font-family:var(--font-cn);background:transparent;border:none}
+.m-tab:hover{color:var(--text-secondary)}.m-tab.active{background:var(--bg-card);color:var(--text);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.m-list{display:flex;flex-direction:column;gap:6px}
+.m-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:var(--transition)}
+.m-item:hover{border-color:var(--border-hover);background:var(--bg-hover)}
+.m-item-body{flex:1;min-width:0}.m-item .mi-cn{font-size:14px;font-weight:500;color:var(--text)}.m-item .mi-en{font-family:var(--font-mono);font-size:11px;color:var(--text-muted)}
+.m-status{font-size:10px;padding:3px 10px;border-radius:999px;white-space:nowrap;font-weight:500}
+.m-status.s-unknown{background:var(--red-light);color:var(--red);border:1px solid var(--red-border)}
+.m-status.s-known{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+.m-status.s-new{background:var(--accent-light);color:var(--accent);border:1px solid #c3d9f5}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;border:1px dashed var(--border);border-radius:var(--radius-lg);background:var(--bg-card)}
+.footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--text-muted);line-height:1.8}
+@media(max-width:420px){.app{padding:12px 12px 80px}.card-cn{font-size:26px}.flashcard{padding:22px 18px;min-height:250px}.tabs{gap:4px}.tab{padding:9px 2px 8px}.header-stats{flex-direction:column;gap:4px;align-items:flex-end}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand"><div class="logo">遨</div><div class="brand-text"><h1>遨海百词斩</h1><p>海事通信 · 45词 · AT-B20系列</p></div></div>
+    <div class="header-stats"><span><span class="dot g"></span> 已掌握 <b id="hdr-known">0</b></span><span><span class="dot r"></span> 待复习 <b id="hdr-unknown">0</b></span></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="tabs">
+    <div class="tab active" data-mode="flashcard"><span class="tab-icon">&#9634;</span><span class="tab-label">翻卡学习</span></div>
+    <div class="tab" data-mode="quiz"><span class="tab-icon">&#10003;</span><span class="tab-label">选择测试</span></div>
+    <div class="tab" data-mode="daily"><span class="tab-icon">&#9733;</span><span class="tab-label">每日推荐</span></div>
+    <div class="tab" data-mode="mastery"><span class="tab-icon">&#9776;</span><span class="tab-label">熟词分组</span></div>
+  </div>
+  <div class="view active" id="view-flashcard">
+    <div class="filters" id="cat-filters"></div>
+    <div class="flashcard" id="flashcard">
+      <div id="card-front"><span class="card-badge" id="c-badge">协议标准</span><h2 class="card-cn" id="c-cn">AIS</h2><p class="card-en" id="c-en">AIS</p><p class="card-fullname" id="c-full">Automatic Identification System</p><p class="card-hint">点击卡片翻面 →</p></div>
+      <div class="card-back" id="card-back"><div class="detail-section"><div class="detail-label">中文全称</div><div class="detail-content" id="b-cnfull"></div></div><div class="detail-section"><div class="detail-label">释义</div><div class="detail-content" id="b-def"></div></div><div class="detail-section"><div class="detail-label">使用场景</div><div class="detail-content" id="b-scene"></div></div><div class="detail-section"><div class="detail-label">相关产品</div><span class="detail-module" id="b-module"></span></div></div>
+    </div>
+    <div class="card-counter" id="card-counter">1 / 45</div>
+    <div class="card-nav"><button class="nav-btn" id="prev-btn">&larr; 上一个</button><button class="nav-btn" id="next-btn">下一个 &rarr;</button></div>
+    <div class="mastery-row"><button class="m-btn unknown" id="mark-unknown">&#10007; 不熟</button><button class="m-btn known" id="mark-known">&#10003; 已掌握</button></div>
+  </div>
+  <div class="view" id="view-quiz">
+    <div class="quiz-stem"><div class="quiz-num">第 <span id="q-num">1</span> 题 · 共10题</div><p class="quiz-q" id="q-text">加载中...</p></div>
+    <div class="quiz-opts" id="q-opts"></div><div class="quiz-feedback" id="q-fb"></div>
+    <div class="btn-row" id="q-btn-row" style="display:none"><button class="btn-primary" id="q-next">下一题 &rarr;</button></div>
+    <div class="quiz-result" id="q-result"><div class="stats-grid"><div class="stat-card"><div class="stat-label">答对</div><div class="stat-val" style="color:var(--green)" id="s-ok">0</div></div><div class="stat-card"><div class="stat-label">答错</div><div class="stat-val" style="color:var(--red)" id="s-err">0</div></div><div class="stat-card"><div class="stat-label">正确率</div><div class="stat-val" style="color:var(--accent)" id="s-rate">0%</div></div></div></div>
+  </div>
+  <div class="view" id="view-daily">
+    <div class="daily-hdr"><div><div class="daily-title">今日推荐</div><div class="daily-date" id="daily-date"></div></div><button class="daily-refresh" id="daily-refresh">换一组</button></div>
+    <div class="daily-list" id="daily-list"></div><div class="daily-note">点击词条跳转到翻卡详情</div>
+  </div>
+  <div class="view" id="view-mastery">
+    <div class="m-tabs"><button class="m-tab active" data-filter="unknown">待复习 <span id="cnt-unknown">(0)</span></button><button class="m-tab" data-filter="new">未学 <span id="cnt-new">(45)</span></button><button class="m-tab" data-filter="known">已掌握 <span id="cnt-known">(0)</span></button></div>
+    <div class="m-list" id="mastery-list"></div>
+  </div>
+  <div class="footer">遨海百词斩 · 词库基于 AT-B20 VDES & AT-B20A AIS 基站产品资料<br>学习进度自动保存在浏览器本地</div>
+</div>
+<script>
+(function(){
+const V=[
+{id:1,cat:"协议标准",cn:"AIS",en:"AIS",full:"Automatic Identification System",cnF:"船舶自动识别系统",def:"用于船舶之间、船岸之间进行通信的海上无线通信系统,能自动交换船舶身份、位置、航向、航速等信息,是现代海事安全的核心系统。",sc:"AT-B20A AIS基站持续接收覆盖区域内的AIS信号,可向船舶发送信息或指令,实现船舶态势感知。",mod:"AT-B20A / AT-B20"},
+{id:2,cat:"协议标准",cn:"VDES",en:"VDES",full:"VHF Data Exchange System",cnF:"甚高频数据交换系统",def:"AIS的升级扩展系统,在AIS基础上增加了ASM和VDE信道,提供更大的数据传输带宽,支持更丰富的海事信息服务。",sc:"AT-B20 VDES基站支持AIS、ASM和VDE全信道收发,为全球关键航路与港口提供VDES数据服务。",mod:"AT-B20"},
+{id:3,cat:"协议标准",cn:"ASM",en:"ASM",full:"Application Specific Messages",cnF:"特定应用消息",def:"VDES系统中专门承载特定应用消息的信道,用于播发气象、航行警告等海事信息。",sc:"VDES基站支持ASM信道的广播消息和寻址消息播发,ASM信道接收灵敏度优于-118dBm。",mod:"AT-B20"},
+{id:4,cat:"协议标准",cn:"VDE",en:"VDE",full:"VHF Data Exchange",cnF:"甚高频数据交换",def:"VDES系统中的宽带数据交换信道,通信速率可达19.2kbps-307.2kbps,用于大容量数据的船岸通信。",sc:"AT-B20 VDES基站支持VDE-1024至VDE-2085等多个VDE信道,支持多种调制方式。",mod:"AT-B20"},
+{id:5,cat:"协议标准",cn:"AIS SART",en:"AIS SART",full:"AIS Search and Rescue Transmitter",cnF:"AIS搜救发射器",def:"基于AIS技术的海上搜救应答装置,船舶遇险时可发射求救信号,周边AIS设备能快速定位遇险船舶位置。",sc:"AT-B20及AT-B20A基站均可接收AIS SART信号,支持海上应急搜救场景。",mod:"AT-B20A / AT-B20"},
+{id:6,cat:"协议标准",cn:"AIS 航标",en:"AIS AtoN",full:"AIS Aid to Navigation",cnF:"AIS助航设备",def:"装有AIS设备的航标(如灯塔、浮标等),通过AIS向过往船舶播发位置及导航信息,帮助船舶安全通行。",sc:"基站可接收AIS航标播发的信息,并支持虚拟航标播发,用于航道规划与电子围栏。",mod:"AT-B20A / AT-B20"},
+{id:7,cat:"协议标准",cn:"A类/B类 AIS",en:"Class A/B",full:"Class A / Class B AIS",cnF:"A类/B类船载AIS",def:"A类AIS为国际航行船舶强制安装(SOLAS公约),B类AIS为小型船舶、渔船等非强制船舶使用的简化版。",sc:"基站可接收A类和B类船载AIS播发的动静态信息,并可指配其位置信息更新频率。",mod:"AT-B20A / AT-B20"},
+{id:8,cat:"协议标准",cn:"MSI",en:"MSI",full:"Maritime Safety Information",cnF:"海上安全信息",def:"向船舶播发的航行安全相关信息,包括航行警告、气象警报、水文信息、搜救信息等。",sc:"AT-B20 VDES基站支持MSI播发,为航行船舶提供实时安全信息。",mod:"AT-B20"},
+{id:9,cat:"协议标准",cn:"ITU-R M.1371-6",en:"ITU-R M.1371-6",full:"ITU-R Recommendation M.1371-6",cnF:"国际电信联盟AIS技术标准",def:"国际电信联盟(ITU)发布的AIS核心技术标准,规定了技术特性、消息格式、信道使用等。",sc:"AT-B20A严格遵循ITU-R M.1371-6标准,保证全球AIS设备兼容性。",mod:"AT-B20A / AT-B20"},
+{id:10,cat:"协议标准",cn:"ITU-R M.2092-2",en:"ITU-R M.2092-2",full:"ITU-R Recommendation M.2092-2",cnF:"国际电信联盟VDES技术标准",def:"国际电信联盟发布的VDES系统技术标准,定义了信道配置、调制方式、数据交换协议等。",sc:"AT-B20符合ITU-R M.2092-2标准,并获德国BSH形式认证。",mod:"AT-B20"},
+{id:11,cat:"协议标准",cn:"IEC 62320-1",en:"IEC 62320-1",full:"IEC 62320-1 Standard",cnF:"AIS基站设备国际标准",def:"国际电工委员会发布的AIS岸基设备性能标准,规定了功能要求、技术指标和测试方法。",sc:"AT-B20系列均通过IEC 62320-1测试,确保国际合规性。",mod:"AT-B20A / AT-B20"},
+{id:12,cat:"协议标准",cn:"IEC 61162-1",en:"IEC 61162-1",full:"IEC 61162-1 Standard",cnF:"船舶导航设备数字接口标准",def:"国际电工委员会发布的船用导航与通信设备数字接口标准,规定了设备间数据传输的协议格式。",sc:"AT-B20系列支持IEC 61162-1:2018接口规范,便于与其他系统对接。",mod:"AT-B20A / AT-B20"},
+{id:13,cat:"协议标准",cn:"BSH认证",en:"BSH",full:"Federal Maritime and Hydrographic Agency",cnF:"德国联邦海事水文局认证",def:"德国联邦海事水文局(BSH)颁发的海事设备形式认证,是海事行业权威的合规认证之一。",sc:"AT-B20 VDES基站已获BSH形式认证,射频性能等达到国际海事最高水平。",mod:"AT-B20"},
+{id:14,cat:"核心功能",cn:"虚拟航标",en:"Virtual AtoN",full:"Virtual Aid to Navigation",cnF:"虚拟航标播发",def:"通过AIS基站发送虚拟航标信号,在电子海图上显示不存在实体的航标,用于临时标识危险区域等。",sc:"AT-B20 VDES基站支持不少于80个虚拟航标播发,可用于航道规划、电子围栏。",mod:"AT-B20A / AT-B20"},
+{id:15,cat:"核心功能",cn:"双机热备",en:"Hot Standby",full:"Dual-unit Hot Standby",cnF:"双机热备份",def:"两台设备同时工作,主设备故障时备用设备自动接管,保证业务连续性和系统高可靠性。",sc:"AT-B20系列均支持双机热备,大幅提升系统可靠性。",mod:"AT-B20A / AT-B20"},
+{id:16,cat:"核心功能",cn:"断点续传",en:"Breakpoint Resume",full:"Breakpoint Resume Transmission",cnF:"断点续传",def:"网络中断时将数据本地存储,网络恢复后自动继续传输,避免数据丢失。",sc:"基站支持断点续传,断网时AIS数据本地存储,联网后自动发送。",mod:"AT-B20A / AT-B20"},
+{id:17,cat:"核心功能",cn:"频谱感知",en:"Spectrum Sensing",full:"Spectrum Sensing",cnF:"频谱感知",def:"设备自动检测无线电频谱使用状况,可实时监测VHF数据链路的信噪比、信号强度、链路负载等。",sc:"AT-B20A基站具备频谱感知功能,可自动监测SNR、RSSI、链路负载等。",mod:"AT-B20A"},
+{id:18,cat:"核心功能",cn:"软件无线电",en:"SDR",full:"Software Defined Radio",cnF:"软件无线电",def:"通过软件实现信号处理的无线电技术,取代传统硬件电路,灵活性高、可升级。",sc:"AT-B20A基于SDR技术,实现多种AIS信号的灵活接收与处理。",mod:"AT-B20A"},
+{id:19,cat:"核心功能",cn:"电子围栏",en:"Geofencing",full:"Geofencing",cnF:"电子围栏",def:"利用虚拟航标和电子海图在海面上划设虚拟边界,船舶进出时触发告警。",sc:"AT-B20A通过虚拟航标播发支持电子围栏建设,适用于港区管理。",mod:"AT-B20A"},
+{id:20,cat:"核心功能",cn:"差分信息播发",en:"DGNSS Broadcast",full:"BD/GPS Differential Message Broadcasting",cnF:"北斗/GPS差分信息播发",def:"将卫星定位差分修正数据通过AIS信道播发给船舶,使定位精度从米级提升到亚米级。",sc:"AT-B20A支持BD/GPS差分信息播发,为港口、内河船舶提供高精度定位。",mod:"AT-B20A"},
+{id:21,cat:"核心功能",cn:"位置信息指配",en:"Position Assignment",full:"Vessel Position Reporting Interval Assignment",cnF:"船位信息播发频率指配",def:"基站向船舶发送指令,指定其位置信息播发的时间间隔,实现高频次位置更新。",sc:"AT-B20A支持对A类/B类船舶位置信息更新频率的监测、查询和指配。",mod:"AT-B20A / AT-B20"},
+{id:22,cat:"核心功能",cn:"等保认证",en:"Cybersecurity Cert.",full:"Cybersecurity Compliance Certification",cnF:"信息安全等级保护认证",def:"中国国家信息安全等级保护制度下的合规认证,是政府、关键基础设施类项目的准入门槛。",sc:"AT-B20 VDES基站支持用户等保认证,满足海事基础设施网络安全合规要求。",mod:"AT-B20"},
+{id:23,cat:"核心功能",cn:"远程升级",en:"Remote Upgrade",full:"Remote Upgrade",cnF:"远程升级",def:"通过网络远程更新设备固件或软件,无需现场维护,降低运维成本。",sc:"AT-B20 VDES基站支持远程升级,配合双机热备实现不间断维护。",mod:"AT-B20"},
+{id:24,cat:"核心功能",cn:"船舶态势感知",en:"Situational Awareness",full:"Vessel Situational Awareness",cnF:"船舶态势感知",def:"实时获取覆盖区域内船舶的位置、航向、航速、身份等信息,形成海上交通态势图。",sc:"AT-B20系列通过持续接收AIS信号,为港口、海事部门提供船舶态势感知。",mod:"AT-B20A / AT-B20"},
+{id:25,cat:"技术参数",cn:"接收灵敏度",en:"Rx Sensitivity",full:"Receiver Sensitivity",cnF:"接收灵敏度",def:"接收机能正确解调信号的最低输入功率,数值越低灵敏度越高,覆盖越远。",sc:"AT-B20系列AIS/ASM信道接收灵敏度优于-118dBm@20%PER。",mod:"AT-B20A / AT-B20"},
+{id:26,cat:"技术参数",cn:"发射功率",en:"Tx Power",full:"Transmit Power",cnF:"发射功率",def:"发射机输出的射频信号功率,决定信号传输距离。功率越大覆盖越远。",sc:"AT-B20系列发射功率可选12.5W/1W两档。",mod:"AT-B20A / AT-B20"},
+{id:27,cat:"技术参数",cn:"调制方式",en:"Modulation",full:"Modulation Type",cnF:"调制方式",def:"将数字信号转换为射频信号的方式。AIS使用GMSK,VDES还支持π/4QPSK、16QAM。",sc:"AT-B20 VDES基站支持GMSK、π/4QPSK、16QAM多种调制方式。",mod:"AT-B20A / AT-B20"},
+{id:28,cat:"技术参数",cn:"GMSK",en:"GMSK",full:"Gaussian Minimum Shift Keying",cnF:"高斯最小频移键控",def:"一种连续相位的频率调制方式,频谱利用率高、抗干扰强,是AIS标准调制方式。",sc:"AT-B20A使用GMSK调制,信道带宽12.5kHz/25kHz,通信速率9.6kbps。",mod:"AT-B20A / AT-B20"},
+{id:29,cat:"技术参数",cn:"SNR",en:"SNR",full:"Signal to Noise Ratio",cnF:"信噪比",def:"信号功率与噪声功率的比值(dB)。SNR越高信号质量越好,通信越可靠。",sc:"AT-B20系列自动监测VHF数据链路的SNR,评估链路质量。",mod:"AT-B20A / AT-B20"},
+{id:30,cat:"技术参数",cn:"RSSI",en:"RSSI",full:"Received Signal Strength Indicator",cnF:"接收信号强度指示",def:"接收端测量到的信号功率大小(dBm),用于评估链路质量和信号覆盖。",sc:"基站自动监测VHF数据链路的RSSI,实时反映接收信号强弱。",mod:"AT-B20A / AT-B20"},
+{id:31,cat:"技术参数",cn:"PER",en:"PER",full:"Packet Error Rate",cnF:"包错误率",def:"接收数据包中错误包的比例,是衡量无线通信质量的关键指标。PER越低越可靠。",sc:"AT-B20 AIS信道灵敏度优于20%PER@-118dBm。",mod:"AT-B20A / AT-B20"},
+{id:32,cat:"技术参数",cn:"GNSS",en:"GNSS",full:"Global Navigation Satellite System",cnF:"全球导航卫星系统",def:"卫星导航系统统称,包括北斗、GPS、GLONASS、GALILEO四大系统。",sc:"AT-B20系列支持四大GNSS系统,通道数量不少于48。",mod:"AT-B20A / AT-B20"},
+{id:33,cat:"技术参数",cn:"VHF",en:"VHF",full:"Very High Frequency",cnF:"甚高频",def:"频率范围30-300MHz的无线电波,海事通信主要使用156-162.025MHz频段。",sc:"AT-B20系列工作在VHF频段,天线频率范围156–162.5MHz。",mod:"AT-B20A / AT-B20"},
+{id:34,cat:"技术参数",cn:"电压驻波比",en:"VSWR",full:"Voltage Standing Wave Ratio",cnF:"电压驻波比",def:"衡量天线与传输线阻抗匹配的指标,理想值为1,越接近1效率越高。",sc:"AT-B20系列VHF天线VSWR≤1.5,保证良好阻抗匹配。",mod:"AT-B20A / AT-B20"},
+{id:35,cat:"技术参数",cn:"天线增益",en:"Antenna Gain",full:"Antenna Gain",cnF:"天线增益",def:"天线将能量集中到特定方向的能力(dBi)。增益越高覆盖越远。",sc:"VDES基站天线增益5.1dBi,AIS基站可选≥6dBi全向天线。",mod:"AT-B20A / AT-B20"},
+{id:36,cat:"技术参数",cn:"冷启动/热启动",en:"Cold/Hot Start",full:"Cold Start / Hot Start Sensitivity",cnF:"冷启动/热启动灵敏度",def:"GNSS接收机首次定位的两种状态。冷启动从零搜星;热启动有星历,定位更快。",sc:"AT-B20系列GNSS冷启动灵敏度优于-146dBm,热启动优于-153dBm。",mod:"AT-B20A / AT-B20"},
+{id:37,cat:"技术参数",cn:"高稳时钟",en:"Stable Clock",full:"High Stability Clock Input",cnF:"高稳定度时钟",def:"提供高精度时间基准的时钟源,用于对时间同步要求极高的通信系统。",sc:"AT-B20系列支持外部高稳时钟输入,保证TDMA时隙同步精度。",mod:"AT-B20A / AT-B20"},
+{id:38,cat:"硬件接口",cn:"RS-422",en:"RS-422",full:"RS-422 Serial Interface",cnF:"RS-422串行接口",def:"差分平衡式串行通信接口,传输距离可达1200米,抗干扰强,用于恶劣环境。",sc:"AT-B20系列配备2路RS-422串口,连接外部系统。",mod:"AT-B20A / AT-B20"},
+{id:39,cat:"硬件接口",cn:"RS-232",en:"RS-232",full:"RS-232 Serial Interface",cnF:"RS-232串行接口",def:"经典串行通信接口,传输距离较短(15米内),广泛用于设备调试。",sc:"AT-B20系列配备4路RS-232串口。",mod:"AT-B20A / AT-B20"},
+{id:40,cat:"硬件接口",cn:"GPIO/PPS",en:"GPIO/PPS",full:"General Purpose IO / Pulse Per Second",cnF:"通用IO/秒脉冲接口",def:"GPIO为通用输入输出接口;PPS为秒脉冲信号,用于精确时间同步。",sc:"AT-B20系列配备1路GPIO/PPS接口。",mod:"AT-B20A / AT-B20"},
+{id:41,cat:"硬件接口",cn:"UHF-K接口",en:"UHF-K",full:"UHF-K Antenna Connector",cnF:"UHF-K型天线接口",def:"大尺寸射频同轴连接器,常用于VHF/UHF通信设备天线连接,机械强度高。",sc:"AT-B20系列VHF天线接口采用UHF-K型。",mod:"AT-B20A / AT-B20"},
+{id:42,cat:"硬件接口",cn:"TNC-K接口",en:"TNC-K",full:"TNC-K Antenna Connector",cnF:"TNC-K型天线接口",def:"螺纹锁紧式射频同轴连接器,频率可达11GHz,常用于GNSS天线连接。",sc:"AT-B20系列GNSS天线接口采用TNC-K型。",mod:"AT-B20A / AT-B20"},
+{id:43,cat:"硬件接口",cn:"2U机架",en:"2U Rack",full:"2U 19-inch Rack-mounted",cnF:"2U 19英寸机架式安装",def:"工业标准机柜安装规格,1U=44.45mm高,2U即88.9mm高,便于机房集成。",sc:"AT-B20系列采用19英寸机架安装,高度2U。",mod:"AT-B20A / AT-B20"},
+{id:44,cat:"硬件接口",cn:"双电源",en:"Dual Power",full:"Dual AC/DC Power Supply",cnF:"交流/直流双电源",def:"同时支持AC和DC两路供电,主电源故障时自动切换备用电源。",sc:"AT-B20系列支持AC 220V和DC 12~36V双电源自动切换。",mod:"AT-B20A / AT-B20"},
+{id:45,cat:"硬件接口",cn:"TCP/IP配置",en:"TCP/IP Config",full:"Local and Remote Configuration via TCP/IP",cnF:"TCP/IP网络配置",def:"通过TCP/IP网络对设备进行本地或远程配置管理和状态监测。",sc:"AT-B20系列支持TCP/IP网络配置监测。",mod:"AT-B20A / AT-B20"}
+];
+const CATS=['all','协议标准','核心功能','技术参数','硬件接口'];
+const catN={all:'全部','协议标准':'协议标准','核心功能':'核心功能','技术参数':'技术参数','硬件接口':'硬件接口'};
+let st={mastery:{},curCat:'all'};
+function save(){try{localStorage.setItem('aohai_v3',JSON.stringify(st))}catch(e){}}
+function load(){try{const d=localStorage.getItem('aohai_v3');if(d)st=JSON.parse(d)}catch(e){}}
+load();
+function shuffle(a){return a.slice().sort(()=>Math.random()-0.5)}
+function seededShuffle(a,s){const o=a.slice();for(let i=o.length-1;i>0;i--){s=(s*9301+49297)%233280;const j=Math.floor((s/233280)*(i+1));[o[i],o[j]]=[o[j],o[i]]}return o}
+function pool(){return st.curCat==='all'?V:V.filter(v=>v.cat===st.curCat)}
+function updateHeader(){const kn=Object.values(st.mastery).filter(x=>x==='known').length;const un=Object.values(st.mastery).filter(x=>x==='unknown').length;document.getElementById('hdr-known').textContent=kn;document.getElementById('hdr-unknown').textContent=un;document.getElementById('cnt-known').textContent='('+kn+')';document.getElementById('cnt-unknown').textContent='('+un+')';document.getElementById('cnt-new').textContent='('+(V.length-kn-un)+')';document.getElementById('progress-fill').style.width=Math.round(kn/V.length*100)+'%'}
+updateHeader();
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const m=t.dataset.mode;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+m).classList.add('active');if(m==='quiz')startQuiz();if(m==='daily')renderDaily();if(m==='mastery')renderMastery('unknown')}));
+const cf=document.getElementById('cat-filters');CATS.forEach(c=>{const ch=document.createElement('span');ch.className='chip'+(c==='all'?' active':'');ch.textContent=catN[c];ch.dataset.cat=c;ch.addEventListener('click',()=>{cf.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));ch.classList.add('active');st.curCat=c;ci=0;renderCard()});cf.appendChild(ch)});
+let ci=0,flipped=false;
+function renderCard(){const p=pool();if(!p.length)return;if(ci>=p.length)ci=0;const v=p[ci];flipped=false;document.getElementById('card-front').style.display='block';document.getElementById('card-back').style.display='none';document.getElementById('c-badge').textContent=v.cat;document.getElementById('c-cn').textContent=v.cn;document.getElementById('c-en').textContent=v.en;document.getElementById('c-full').textContent=v.full;document.getElementById('b-cnfull').textContent=v.cnF;document.getElementById('b-def').textContent=v.def;document.getElementById('b-scene').textContent=v.sc;document.getElementById('b-module').textContent=v.mod;document.getElementById('card-counter').textContent=(ci+1)+' / '+p.length;document.getElementById('prev-btn').disabled=ci===0;document.getElementById('next-btn').disabled=ci===p.length-1}
+renderCard();
+document.getElementById('flashcard').addEventListener('click',()=>{flipped=!flipped;document.getElementById('card-front').style.display=flipped?'none':'block';document.getElementById('card-back').style.display=flipped?'block':'none'});
+document.getElementById('prev-btn').addEventListener('click',e=>{e.stopPropagation();if(ci>0){ci--;renderCard()}});
+document.getElementById('next-btn').addEventListener('click',e=>{e.stopPropagation();if(ci<pool().length-1){ci++;renderCard()}});
+document.getElementById('mark-unknown').addEventListener('click',e=>{e.stopPropagation();st.mastery[pool()[ci].id]='unknown';save();updateHeader();const el=e.currentTarget;el.textContent='✓ 已标记';setTimeout(()=>el.innerHTML='&#10007; 不熟',600)});
+document.getElementById('mark-known').addEventListener('click',e=>{e.stopPropagation();st.mastery[pool()[ci].id]='known';save();updateHeader();if(ci<pool().length-1){ci++;renderCard()}else{const el=e.currentTarget;el.textContent='✓ 全部完成!';setTimeout(()=>el.innerHTML='&#10003; 已掌握',600)}});
+let qPool=[],qi=0,sOk=0,sErr=0;
+function startQuiz(){qPool=shuffle(V).slice(0,10);qi=0;sOk=0;sErr=0;document.getElementById('q-result').style.display='none';document.getElementById('q-next').textContent='下一题 →';document.getElementById('q-next').onclick=()=>{qi++;renderQ()};renderQ()}
+function renderQ(){if(qi>=qPool.length){endQuiz();return}const v=qPool[qi];const sc=V.filter(x=>x.id!==v.id&&x.cat===v.cat);const others=(sc.length>=3?shuffle(sc).slice(0,3):shuffle(V.filter(x=>x.id!==v.id)).slice(0,3));const opts=shuffle([v,...others]);document.getElementById('q-num').textContent=qi+1;document.getElementById('q-text').textContent='「'+v.def+'」— 以上描述的是哪个术语?';const oc=document.getElementById('q-opts');oc.innerHTML='';const L='ABCD';opts.forEach((o,i)=>{const b=document.createElement('div');b.className='quiz-opt';b.innerHTML='<span class="letter">'+L[i]+'</span><span>'+o.cn+' <span class="opt-en">'+o.en+'</span></span>';b.addEventListener('click',()=>answer(b,o,v,oc));oc.appendChild(b)});document.getElementById('q-fb').style.display='none';document.getElementById('q-btn-row').style.display='none'}
+function answer(btn,chosen,correct,oc){oc.querySelectorAll('.quiz-opt').forEach(o=>o.classList.add('disabled'));const fb=document.getElementById('q-fb');if(chosen.id===correct.id){btn.classList.add('correct');sOk++;fb.innerHTML='<b style="color:var(--green)">&#10003; 正确!</b> '+correct.cn+' · '+correct.full}else{btn.classList.add('wrong');sErr++;oc.querySelectorAll('.quiz-opt').forEach(o=>{if(o.textContent.includes(correct.cn))o.classList.add('correct')});st.mastery[correct.id]='unknown';fb.innerHTML='<b style="color:var(--red)">&#10007; 答案: '+correct.cn+'</b> · '+correct.full+'<br><span style="color:var(--text-muted)">'+correct.sc+'</span>'}save();updateHeader();fb.style.display='block';document.getElementById('q-btn-row').style.display='flex'}
+function endQuiz(){const rate=sOk+sErr>0?Math.round(sOk/(sOk+sErr)*100):0;document.getElementById('q-text').textContent='本轮测试完成!';document.getElementById('q-num').textContent=qPool.length;document.getElementById('q-opts').innerHTML='';document.getElementById('q-fb').style.display='none';document.getElementById('s-ok').textContent=sOk;document.getElementById('s-err').textContent=sErr;document.getElementById('s-rate').textContent=rate+'%';document.getElementById('q-result').style.display='block';document.getElementById('q-btn-row').style.display='flex';document.getElementById('q-next').textContent='再来一轮';document.getElementById('q-next').onclick=startQuiz}
+let dailyOff=0;
+function renderDaily(){const d=new Date();document.getElementById('daily-date').textContent=d.getFullYear()+'.'+(d.getMonth()+1).toString().padStart(2,'0')+'.'+d.getDate().toString().padStart(2,'0');const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()+dailyOff;const picks=seededShuffle(V,seed).slice(0,5);const list=document.getElementById('daily-list');list.innerHTML='';picks.forEach(v=>{const el=document.createElement('div');el.className='daily-item';el.innerHTML='<div class="daily-top"><span class="daily-cn">'+v.cn+'</span><span class="daily-en">'+v.en+'</span></div><div class="daily-def">'+v.def+'</div>';el.addEventListener('click',()=>goTo(v.id));list.appendChild(el)})}
+document.getElementById('daily-refresh').addEventListener('click',()=>{dailyOff+=7919;renderDaily()});
+function goTo(id){ci=V.findIndex(x=>x.id===id);st.curCat='all';cf.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.cat==='all'));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.mode==='flashcard'));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-flashcard').classList.add('active');renderCard();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.m-tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.m-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderMastery(t.dataset.filter)}));
+function renderMastery(f){const list=document.getElementById('mastery-list');list.innerHTML='';let items;if(f==='unknown')items=V.filter(v=>st.mastery[v.id]==='unknown');else if(f==='known')items=V.filter(v=>st.mastery[v.id]==='known');else items=V.filter(v=>!st.mastery[v.id]);if(!items.length){list.innerHTML='<div class="empty-state">这个分组暂时没有词<br>去翻卡学习标记掌握状态吧</div>';return}items.forEach(v=>{const s=st.mastery[v.id]||'new';const sT=s==='known'?'已掌握':s==='unknown'?'待复习':'未学';const el=document.createElement('div');el.className='m-item';el.innerHTML='<div class="m-item-body"><div class="mi-cn">'+v.cn+'</div><div class="mi-en">'+v.en+'</div></div><span class="m-status s-'+s+'">'+sT+'</span>';el.addEventListener('click',()=>goTo(v.id));list.appendChild(el)})}
+})();
+</script>
+</body>
+</html>
