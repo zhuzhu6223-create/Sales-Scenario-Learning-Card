@@ -444,7 +444,7 @@ body {
 .fc-card {
   width: 100%;
   max-width: 480px;
-  min-height: 260px;
+  min-height: 320px;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
@@ -464,6 +464,7 @@ body {
   justify-content: center;
   padding: 28px 24px;
   text-align: center;
+  overflow-y: auto;
 }
 .fc-front {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
