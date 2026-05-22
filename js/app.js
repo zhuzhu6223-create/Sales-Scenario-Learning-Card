@@ -4,7 +4,7 @@ const State = {
   currentScenarioId: null,
   currentModuleKey: "tagline",
   flashcard: {
-    scenarioId: null,       // null = all scenarios
+    scenarioId: null,
     cards: [],
     index: 0,
     flipped: false,
@@ -15,7 +15,7 @@ const State = {
     scenarioId: null,
     questions: [],
     index: 0,
-    answers: [],   // { selectedIndex, correct }
+    answers: [],
     submitted: false,
   },
   progress: loadProgress(),
@@ -63,14 +63,15 @@ function navigate(view, params = {}) {
 function render() {
   const app = document.getElementById("app");
   switch (State.currentView) {
-    case "home":           app.innerHTML = renderHome(); break;
-    case "scenario":       app.innerHTML = renderScenarioDetail(); break;
-    case "flashcard":      app.innerHTML = renderFlashcard(); break;
-    case "quiz":           app.innerHTML = renderQuiz(); break;
-    case "quiz-result":    app.innerHTML = renderQuizResult(); break;
-    case "progress":       app.innerHTML = renderProgress(); break;
-    case "mode-select":    app.innerHTML = renderModeSelect(); break;
-    default:               app.innerHTML = renderHome();
+    case "home":              app.innerHTML = renderHome(); break;
+    case "scenario":          app.innerHTML = renderScenarioDetail(); break;
+    case "flashcard":         app.innerHTML = renderFlashcard(); break;
+    case "flashcard-result":  app.innerHTML = renderFlashcardResult(); break;
+    case "quiz":              app.innerHTML = renderQuiz(); break;
+    case "quiz-result":       app.innerHTML = renderQuizResult(); break;
+    case "progress":          app.innerHTML = renderProgress(); break;
+    case "mode-select":       app.innerHTML = renderModeSelect(); break;
+    default:                  app.innerHTML = renderHome();
   }
   bindEvents();
 }
@@ -222,7 +223,7 @@ function renderModuleContent(key, m, scenario) {
           <div class="script-box">${m.tagline}</div>
         </div>`;
 
-    case "targetCustomers":
+    case "targetCustomers": {
       const tc = m.targetCustomers;
       return `
         <div class="module-section">
@@ -244,6 +245,7 @@ function renderModuleContent(key, m, scenario) {
             ${tc.influencers.map(t => `<span class="tag">${t}</span>`).join("")}
           </div>
         </div>`;
+    }
 
     case "businessConcerns":
       return `
@@ -258,7 +260,7 @@ function renderModuleContent(key, m, scenario) {
           </div>
         </div>`;
 
-    case "recommendedSolutions":
+    case "recommendedSolutions": {
       const rs = m.recommendedSolutions;
       return `
         <div class="module-section">
@@ -286,6 +288,7 @@ function renderModuleContent(key, m, scenario) {
             <div class="solution-tags">${rs.services.map(t => `<span class="solution-tag">${t}</span>`).join("")}</div>
           </div>
         </div>`;
+    }
 
     case "firstVisitScript":
       return `
@@ -324,7 +327,7 @@ function renderModuleContent(key, m, scenario) {
           </div>
         </div>`;
 
-    case "boundaries":
+    case "boundaries": {
       const b = m.boundaries;
       const boundaryTypes = [
         { label: "技术边界", items: b.technical, icon: "⚙️" },
@@ -343,6 +346,7 @@ function renderModuleContent(key, m, scenario) {
               </div>
             </div>`).join("")}
         </div>`;
+    }
 
     default:
       return `<div class="empty-state"><div class="empty-text">内容准备中...</div></div>`;
@@ -410,6 +414,57 @@ function renderFlashcard() {
   </div>`;
 }
 
+// ===== Flashcard Result Screen =====
+function renderFlashcardResult() {
+  const fc = State.flashcard;
+  const masteredCount = fc.mastered.size;
+  const total = fc.cards.length;
+  const pct = Math.round((masteredCount / total) * 100);
+  const againCount = fc.again.size;
+  const scenarioName = fc.scenarioId
+    ? SCENARIOS.find(s => s.id === fc.scenarioId)?.name
+    : "全场景";
+
+  let title, desc;
+  if (pct === 100) {
+    title = "完美！全部掌握 🎉";
+    desc = "所有卡片均已掌握，继续保持！";
+  } else if (pct >= 60) {
+    title = "不错！继续加油 💪";
+    desc = `还有 ${againCount} 张需要继续练习，趁热打铁！`;
+  } else {
+    title = "继续努力 📚";
+    desc = `还有 ${againCount} 张需要练习，多练几遍会更熟悉！`;
+  }
+
+  return `
+  <div class="app-shell">
+    ${renderHeader({ title: "练习完成", showBack: false })}
+    <div class="main-content result-screen has-bottom-nav">
+      <div class="result-score-ring" style="--score-pct:${pct * 3.6}deg">
+        <div class="result-score-inner">
+          <div class="result-score-num">${pct}%</div>
+          <div class="result-score-label">掌握率</div>
+        </div>
+      </div>
+      <div class="result-title">${title}</div>
+      <div class="result-desc">${scenarioName} · 已掌握 ${masteredCount}/${total} 张卡片<br>${desc}</div>
+
+      <div class="module-cta" style="flex-direction:column;gap:10px">
+        ${againCount > 0 ? `
+          <button class="btn btn-primary" data-action="fc-practice-again">🔁 继续练习 ${againCount} 张</button>
+        ` : ""}
+        ${fc.scenarioId ? `
+          <button class="btn btn-secondary" data-action="back-to-scenario">← 返回战卡</button>
+        ` : `
+          <button class="btn btn-secondary" data-action="go-home">← 返回首页</button>
+        `}
+      </div>
+    </div>
+    ${renderBottomNav("")}
+  </div>`;
+}
+
 // ===== Quiz Screen =====
 function renderQuiz() {
   const quiz = State.quiz;
@@ -432,7 +487,7 @@ function renderQuiz() {
       backView: quiz.scenarioId ? "scenario" : "home",
     })}
 
-    <div class="main-content quiz-screen">
+    <div class="main-content quiz-screen has-bottom-nav">
       <div class="fc-progress-bar" style="margin-bottom:16px">
         <div class="fc-progress-fill" style="width:${pct}%;height:6px;background:var(--primary-light);border-radius:3px"></div>
       </div>
@@ -486,7 +541,7 @@ function renderQuizResult() {
   return `
   <div class="app-shell">
     ${renderHeader({ title: "测验结果", showBack: false })}
-    <div class="main-content result-screen">
+    <div class="main-content result-screen has-bottom-nav">
       <div class="result-score-ring" style="--score-pct:${pct * 3.6}deg">
         <div class="result-score-inner">
           <div class="result-score-num">${pct}%</div>
@@ -601,12 +656,13 @@ function renderBottomNav(active) {
 
 // ===== Event Binding =====
 function bindEvents() {
-  document.addEventListener("click", handleClick, { once: true });
+  document.removeEventListener("click", handleClick);
+  document.addEventListener("click", handleClick);
 }
 
 function handleClick(e) {
   const target = e.target.closest("[data-action], [data-scenario-id], [data-module]");
-  if (!target) { bindEvents(); return; }
+  if (!target) return;
 
   const action = target.dataset.action;
   const scenarioId = target.dataset.scenarioId ? parseInt(target.dataset.scenarioId) : null;
@@ -618,15 +674,6 @@ function handleClick(e) {
 
     case "go-home":
       navigate("home");
-      break;
-
-    // Scenario card click
-    case undefined:
-      if (scenarioId) {
-        State.currentScenarioId = scenarioId;
-        State.currentModuleKey = "tagline";
-        navigate("scenario", { currentScenarioId: scenarioId });
-      } else { bindEvents(); }
       break;
 
     case "all-flashcards":
@@ -669,24 +716,41 @@ function handleClick(e) {
       advanceFlashcard();
       break;
 
-    case "fc-gotit":
+    case "fc-gotit": {
       const cardId = State.flashcard.cards[State.flashcard.index].id;
       State.flashcard.mastered.add(cardId);
       markCardMastered(cardId);
       advanceFlashcard();
       break;
+    }
 
     case "fc-skip":
       advanceFlashcard();
       break;
 
-    case "quiz-answer":
-      if (State.quiz.answers[State.quiz.index]) { bindEvents(); break; }
+    case "fc-practice-again": {
+      const fc = State.flashcard;
+      const againCards = fc.cards.filter(c => fc.again.has(c.id));
+      State.flashcard = {
+        scenarioId: fc.scenarioId,
+        cards: shuffle(againCards),
+        index: 0,
+        flipped: false,
+        mastered: new Set([...fc.mastered]),
+        again: new Set(),
+      };
+      navigate("flashcard");
+      break;
+    }
+
+    case "quiz-answer": {
+      if (State.quiz.answers[State.quiz.index]) break;
       const optIdx = parseInt(target.dataset.index);
       const isCorrect = State.quiz.questions[State.quiz.index].options[optIdx].correct;
       State.quiz.answers[State.quiz.index] = { selectedIndex: optIdx, correct: isCorrect };
       render();
       break;
+    }
 
     case "quiz-next":
       if (State.quiz.index < State.quiz.questions.length - 1) {
@@ -701,25 +765,29 @@ function handleClick(e) {
       startQuiz(State.quiz.scenarioId);
       break;
 
-    case "back-to-scenario":
-      navigate("scenario", { currentScenarioId: State.quiz.scenarioId, currentModuleKey: "tagline" });
+    case "back-to-scenario": {
+      const sid = State.quiz.scenarioId ?? State.flashcard.scenarioId;
+      navigate("scenario", { currentScenarioId: sid, currentModuleKey: "tagline" });
       break;
+    }
 
     case "reset-progress":
       if (confirm("确定重置所有学习进度吗？")) {
         State.progress = {};
         saveProgress();
         navigate("progress");
-      } else { bindEvents(); }
+      }
       break;
 
     default:
-      // Module tab switch
+      // Module tab switch or scenario card click (no data-action)
       if (target.dataset.module) {
         State.currentModuleKey = target.dataset.module;
         render();
-      } else {
-        bindEvents();
+      } else if (scenarioId) {
+        State.currentScenarioId = scenarioId;
+        State.currentModuleKey = "tagline";
+        navigate("scenario", { currentScenarioId: scenarioId });
       }
   }
 }
@@ -752,11 +820,7 @@ function advanceFlashcard() {
     fc.index++;
     render();
   } else {
-    // Session complete — show summary via alert then go back
-    const masteredCount = fc.mastered.size;
-    const total = fc.cards.length;
-    alert(`🎉 本轮练习完成！\n已掌握 ${masteredCount}/${total} 张卡片。`);
-    navigate(fc.scenarioId ? "scenario" : "home");
+    navigate("flashcard-result");
   }
 }
 
