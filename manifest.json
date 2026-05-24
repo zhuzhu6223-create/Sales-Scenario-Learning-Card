@@ -1,0 +1,16 @@
+{
+  "name": "销售场景战卡",
+  "short_name": "战卡学习",
+  "description": "销售场景学习系统 - 闪卡练习、知识测验、话术速查、场景管理",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f2d5e",
+  "theme_color": "#0f2d5e",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

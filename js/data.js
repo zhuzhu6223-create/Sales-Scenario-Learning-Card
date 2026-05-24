@@ -554,7 +554,7 @@ function generateQuizQuestions(scenario) {
   const questions = [];
 
   // Q1: Decision maker identification
-  const allDM = SCENARIOS.flatMap(s => s.modules.targetCustomers.decisionMakers);
+  const allDM = getScenarios().flatMap(s => s.modules.targetCustomers.decisionMakers);
   const wrongDM = allDM.filter(d => !m.targetCustomers.decisionMakers.includes(d));
   questions.push({
     id: `${scenario.id}-q1`,
@@ -568,7 +568,7 @@ function generateQuizQuestions(scenario) {
   });
 
   // Q2: Core pain point
-  const allPains = SCENARIOS.filter(s => s.id !== scenario.id).map(s => s.modules.businessConcerns[1] || s.modules.businessConcerns[0]);
+  const allPains = getScenarios().filter(s => s.id !== scenario.id).map(s => s.modules.businessConcerns[1] || s.modules.businessConcerns[0]);
   questions.push({
     id: `${scenario.id}-q2`,
     scenarioId: scenario.id,
@@ -581,7 +581,7 @@ function generateQuizQuestions(scenario) {
   });
 
   // Q3: Pilot approach
-  const allPilots = SCENARIOS.filter(s => s.id !== scenario.id).map(s => s.modules.pilotSuggestions[0]);
+  const allPilots = getScenarios().filter(s => s.id !== scenario.id).map(s => s.modules.pilotSuggestions[0]);
   questions.push({
     id: `${scenario.id}-q3`,
     scenarioId: scenario.id,
@@ -600,7 +600,7 @@ function generateQuizQuestions(scenario) {
     question: `拜访「${scenario.name}」客户，首先应该确认哪方面的现状？`,
     options: shuffle([
       { text: m.keyQuestions[0], correct: true },
-      ...SCENARIOS.filter(s => s.id !== scenario.id)
+      ...getScenarios().filter(s => s.id !== scenario.id)
         .map(s => s.modules.keyQuestions[0])
         .slice(0, 3)
         .map(t => ({ text: t, correct: false }))
@@ -618,6 +618,88 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// ===== Data Management =====
+const BUILT_IN_SCENARIOS = SCENARIOS.slice();
+
+function loadCustomData() {
+  try {
+    return {
+      custom: JSON.parse(localStorage.getItem('slc_custom') || '[]'),
+      modified: JSON.parse(localStorage.getItem('slc_modified') || '{}'),
+      deleted: new Set(JSON.parse(localStorage.getItem('slc_deleted') || '[]')),
+    };
+  } catch { return { custom: [], modified: {}, deleted: new Set() }; }
+}
+
+function saveCustomData(data) {
+  localStorage.setItem('slc_custom', JSON.stringify(data.custom));
+  localStorage.setItem('slc_modified', JSON.stringify(data.modified));
+  localStorage.setItem('slc_deleted', JSON.stringify([...data.deleted]));
+}
+
+function getScenarios() {
+  const { custom, modified, deleted } = loadCustomData();
+  const builtIn = BUILT_IN_SCENARIOS
+    .filter(s => !deleted.has(s.id))
+    .map(s => {
+      if (!modified[s.id]) return s;
+      const m = modified[s.id];
+      return { ...s, ...m, modules: { ...s.modules, ...(m.modules || {}) } };
+    });
+  return [...builtIn, ...custom];
+}
+
+function saveScenario(scenario) {
+  const { custom, modified, deleted } = loadCustomData();
+  if (BUILT_IN_SCENARIOS.some(s => s.id === scenario.id)) {
+    modified[scenario.id] = scenario;
+  } else {
+    const idx = custom.findIndex(s => s.id === scenario.id);
+    if (idx >= 0) custom[idx] = scenario;
+    else custom.push(scenario);
+  }
+  saveCustomData({ custom, modified, deleted });
+}
+
+function deleteScenario(id) {
+  const { custom, modified, deleted } = loadCustomData();
+  if (BUILT_IN_SCENARIOS.some(s => s.id === id)) {
+    deleted.add(id);
+  } else {
+    const idx = custom.findIndex(s => s.id === id);
+    if (idx >= 0) custom.splice(idx, 1);
+  }
+  saveCustomData({ custom, modified, deleted });
+}
+
+function isBuiltInScenario(id) {
+  return BUILT_IN_SCENARIOS.some(s => s.id === id);
+}
+
+function nextScenarioId() {
+  const { custom } = loadCustomData();
+  return custom.reduce((m, s) => Math.max(m, s.id), 999) + 1;
+}
+
+function getNestedValue(obj, path) {
+  return path.split('.').reduce((o, k) => (o != null ? o[k] : undefined), obj);
+}
+
+function setNestedValue(obj, path, value) {
+  const parts = path.split('.');
+  const last = parts.pop();
+  const parent = parts.reduce((o, k) => (o != null ? o[k] : undefined), obj);
+  if (parent != null) parent[last] = value;
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // Module display config

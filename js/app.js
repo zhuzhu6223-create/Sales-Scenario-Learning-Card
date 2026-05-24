@@ -19,6 +19,10 @@ const State = {
     submitted: false,
   },
   progress: loadProgress(),
+  edit: {
+    scenarioId: null,
+    form: null,
+  },
 };
 
 // ===== Progress Storage =====
@@ -37,13 +41,13 @@ function markCardMastered(cardId) {
 }
 function getScenarioProgress(scenarioId) {
   const mastered = State.progress.mastered || {};
-  const cards = generateFlashcards(SCENARIOS.find(s => s.id === scenarioId));
+  const cards = generateFlashcards(getScenarios().find(s => s.id === scenarioId));
   const masteredCount = cards.filter(c => mastered[c.id]).length;
   return { total: cards.length, mastered: masteredCount, pct: Math.round((masteredCount / cards.length) * 100) };
 }
 function getOverallProgress() {
   let total = 0, mastered = 0;
-  SCENARIOS.forEach(s => {
+  getScenarios().forEach(s => {
     const p = getScenarioProgress(s.id);
     total += p.total;
     mastered += p.mastered;
@@ -71,6 +75,8 @@ function render() {
     case "quiz-result":       app.innerHTML = renderQuizResult(); break;
     case "progress":          app.innerHTML = renderProgress(); break;
     case "mode-select":       app.innerHTML = renderModeSelect(); break;
+    case "manage":            app.innerHTML = renderManage(); break;
+    case "scenario-edit":     app.innerHTML = renderScenarioEdit(); break;
     default:                  app.innerHTML = renderHome();
   }
   bindEvents();
@@ -88,7 +94,7 @@ function renderHome() {
         <div class="home-hero-sub">掌握场景话术，成为行业解决方案专家</div>
         <div class="home-stats">
           <div class="stat-item">
-            <div class="stat-num">${SCENARIOS.length}</div>
+            <div class="stat-num">${getScenarios().length}</div>
             <div class="stat-label">销售场景</div>
           </div>
           <div class="stat-item">
@@ -104,7 +110,7 @@ function renderHome() {
 
       <div class="section-title">📋 选择场景学习</div>
       <div class="scenario-grid">
-        ${SCENARIOS.map(s => renderScenarioCard(s)).join("")}
+        ${getScenarios().map(s => renderScenarioCard(s)).join("")}
       </div>
 
       <div class="section-title">⚡ 快速练习</div>
@@ -162,7 +168,7 @@ function renderScenarioCard(scenario) {
 
 // ===== Scenario Detail =====
 function renderScenarioDetail() {
-  const scenario = SCENARIOS.find(s => s.id === State.currentScenarioId);
+  const scenario = getScenarios().find(s => s.id === State.currentScenarioId);
   if (!scenario) return renderHome();
   const m = scenario.modules;
   const activeKey = State.currentModuleKey || "tagline";
@@ -363,7 +369,7 @@ function renderFlashcard() {
   const pct = Math.round(((fc.index) / total) * 100);
   const masteredCount = fc.mastered.size;
   const scenarioName = fc.scenarioId
-    ? SCENARIOS.find(s => s.id === fc.scenarioId)?.name
+    ? getScenarios().find(s => s.id === fc.scenarioId)?.name
     : "全场景";
 
   return `
@@ -422,7 +428,7 @@ function renderFlashcardResult() {
   const pct = Math.round((masteredCount / total) * 100);
   const againCount = fc.again.size;
   const scenarioName = fc.scenarioId
-    ? SCENARIOS.find(s => s.id === fc.scenarioId)?.name
+    ? getScenarios().find(s => s.id === fc.scenarioId)?.name
     : "全场景";
 
   let title, desc;
@@ -475,7 +481,7 @@ function renderQuiz() {
   const pct = Math.round(((quiz.index) / total) * 100);
   const answer = quiz.answers[quiz.index];
   const scenarioName = quiz.scenarioId
-    ? SCENARIOS.find(s => s.id === quiz.scenarioId)?.name
+    ? getScenarios().find(s => s.id === quiz.scenarioId)?.name
     : "综合测验";
 
   return `
@@ -578,7 +584,7 @@ function renderProgress() {
 
       <div class="section-title">各场景进度</div>
       <div class="progress-detail-list">
-        ${SCENARIOS.map(s => {
+        ${getScenarios().map(s => {
           const prog = getScenarioProgress(s.id);
           return `
           <div class="progress-detail-item" data-scenario-id="${s.id}">
@@ -609,7 +615,7 @@ function renderModeSelect() {
     ${renderHeader({ title: "话术速查", showBack: true, backView: "home" })}
     <div class="main-content mode-select-screen has-bottom-nav">
       <div class="section-title" style="margin-bottom:16px">选择场景，查看首次拜访话术</div>
-      ${SCENARIOS.map(s => `
+      ${getScenarios().map(s => `
         <div class="mode-card" data-action="view-script" data-scenario-id="${s.id}">
           <div class="mode-icon">${s.icon}</div>
           <div class="mode-info">
@@ -620,6 +626,166 @@ function renderModeSelect() {
         </div>`).join("")}
     </div>
     ${renderBottomNav("")}
+  </div>`;
+}
+
+// ===== Management Screen =====
+function renderManage() {
+  const scenarios = getScenarios();
+  return `
+  <div class="app-shell">
+    ${renderHeader({ title: "场景管理", showBack: false })}
+    <div class="main-content has-bottom-nav">
+      <button class="btn btn-primary" style="width:100%;margin-bottom:20px" data-action="add-scenario">
+        + 新增战卡场景
+      </button>
+      <div class="section-title">📋 所有场景（${scenarios.length} 个）</div>
+      <div class="manage-list">
+        ${scenarios.map(s => `
+          <div class="manage-card">
+            <div class="manage-icon" style="background:${s.colorLight || '#f0f4f8'}">${s.icon}</div>
+            <div class="manage-info">
+              <div class="manage-name">${escHtml(s.name)}</div>
+              <span class="manage-badge ${isBuiltInScenario(s.id) ? 'builtin' : 'custom'}">${isBuiltInScenario(s.id) ? '内置' : '自定义'}</span>
+            </div>
+            <div class="manage-actions">
+              <button class="manage-btn edit" data-action="edit-scenario" data-scenario-id="${s.id}">编辑</button>
+              <button class="manage-btn delete" data-action="delete-scenario" data-scenario-id="${s.id}">删除</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="mt-16">
+        <button class="btn btn-secondary" style="width:100%" data-action="manage-reset-all">重置所有自定义数据</button>
+      </div>
+    </div>
+    ${renderBottomNav("manage")}
+  </div>`;
+}
+
+// ===== Scenario Edit Screen =====
+function renderScenarioEdit() {
+  const form = State.edit.form;
+  if (!form) { navigate('manage'); return ''; }
+  const title = State.edit.scenarioId === null ? '新增战卡' : '编辑战卡';
+  const m = form.modules;
+
+  const COLORS = [
+    { color: '#1d4ed8', light: '#dbeafe', theme: 'blue' },
+    { color: '#0369a1', light: '#e0f2fe', theme: 'teal' },
+    { color: '#059669', light: '#d1fae5', theme: 'green' },
+    { color: '#7c3aed', light: '#ede9fe', theme: 'purple' },
+    { color: '#c2410c', light: '#ffedd5', theme: 'orange' },
+    { color: '#e11d48', light: '#ffe4e6', theme: 'rose' },
+  ];
+  const ICONS = ['⚓','🛢️','📡','🚢','⛵','🐟','🌊','🏗️','🚀','💡','📋','🎯','💼','📊','🔧','🛡️','⚡','🌐','🏭','🔬','📱','🤝','💰','🎓'];
+
+  function listEditor(path, items, placeholder) {
+    return `
+      <div class="list-editor">
+        ${(items || []).map((item, i) => `
+          <div class="list-row">
+            <textarea class="list-textarea" data-path="${path}" data-index="${i}" rows="2" placeholder="${placeholder || '请输入内容'}">${escHtml(item)}</textarea>
+            <button class="list-del" data-action="list-delete" data-path="${path}" data-index="${i}">×</button>
+          </div>
+        `).join('')}
+        <button class="list-add" data-action="list-add" data-path="${path}">+ 添加</button>
+      </div>`;
+  }
+
+  return `
+  <div class="app-shell">
+    ${renderHeader({ title, showBack: true, backView: 'manage', actions: `<button class="header-btn" data-action="save-scenario">💾 保存</button>` })}
+    <div class="main-content has-bottom-nav" style="padding-top:12px">
+
+      <div class="edit-section">
+        <div class="edit-section-title">📝 基本信息</div>
+        <div class="form-group">
+          <label>场景名称</label>
+          <input type="text" class="form-input" data-path="name" value="${escHtml(form.name)}" placeholder="场景名称">
+        </div>
+        <div class="form-group">
+          <label>简称</label>
+          <input type="text" class="form-input" data-path="shortName" value="${escHtml(form.shortName)}" placeholder="简称（如：港口）">
+        </div>
+        <div class="form-group">
+          <label>场景摘要</label>
+          <textarea class="form-input" data-path="summary" rows="2" placeholder="一句话描述场景">${escHtml(form.summary)}</textarea>
+        </div>
+        <div class="form-group">
+          <label>图标（点击选择）</label>
+          <div class="icon-picker">
+            ${ICONS.map(icon => `<button class="icon-opt ${form.icon === icon ? 'selected' : ''}" data-action="pick-icon" data-icon="${icon}">${icon}</button>`).join('')}
+          </div>
+          <input type="hidden" data-path="icon" value="${escHtml(form.icon)}">
+        </div>
+        <div class="form-group">
+          <label>主题色（点击选择）</label>
+          <div class="color-picker">
+            ${COLORS.map(c => `<button class="color-opt ${form.color === c.color ? 'selected' : ''}" data-action="pick-color" data-color="${c.color}" data-light="${c.light}" data-theme="${c.theme}" style="background:${c.color}"></button>`).join('')}
+          </div>
+          <input type="hidden" data-path="color" value="${escHtml(form.color)}">
+          <input type="hidden" data-path="colorLight" value="${escHtml(form.colorLight)}">
+          <input type="hidden" data-path="theme" value="${escHtml(form.theme || 'blue')}">
+        </div>
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">💡 场景一句话定位</div>
+        <textarea class="form-input" data-path="modules.tagline" rows="4" placeholder="用一句话说清楚这个场景卖的是什么">${escHtml(m.tagline)}</textarea>
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">👥 目标客户</div>
+        <div class="form-group"><label>单位类型</label>${listEditor('modules.targetCustomers.unitTypes', m.targetCustomers.unitTypes, '如：港口集团、引航站...')}</div>
+        <div class="form-group"><label>接触角色</label>${listEditor('modules.targetCustomers.roles', m.targetCustomers.roles, '如：信息化负责人...')}</div>
+        <div class="form-group"><label>关键决策人</label>${listEditor('modules.targetCustomers.decisionMakers', m.targetCustomers.decisionMakers, '如：副总/IT总监...')}</div>
+        <div class="form-group"><label>终端用户</label>${listEditor('modules.targetCustomers.users', m.targetCustomers.users, '如：调度员、值班员...')}</div>
+        <div class="form-group"><label>影响人</label>${listEditor('modules.targetCustomers.influencers', m.targetCustomers.influencers, '如：主管部门、集成商...')}</div>
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">🎯 客户痛点</div>
+        ${listEditor('modules.businessConcerns', m.businessConcerns, '如：通信覆盖不足：...')}
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">📦 推荐方案</div>
+        <div class="form-group"><label>平台</label>${listEditor('modules.recommendedSolutions.platform', m.recommendedSolutions.platform, '平台/系统名称')}</div>
+        <div class="form-group"><label>设备</label>${listEditor('modules.recommendedSolutions.equipment', m.recommendedSolutions.equipment, '设备名称')}</div>
+        <div class="form-group"><label>通信</label>${listEditor('modules.recommendedSolutions.communication', m.recommendedSolutions.communication, '通信方案')}</div>
+        <div class="form-group"><label>感知/算法</label>${listEditor('modules.recommendedSolutions.perception', m.recommendedSolutions.perception, '感知/算法能力')}</div>
+        <div class="form-group"><label>服务</label>${listEditor('modules.recommendedSolutions.services', m.recommendedSolutions.services, '服务内容')}</div>
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">💬 首次拜访话术</div>
+        <textarea class="form-input" data-path="modules.firstVisitScript" rows="8" placeholder="首次拜访开场话术...">${escHtml(m.firstVisitScript)}</textarea>
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">❓ 必问问题</div>
+        ${listEditor('modules.keyQuestions', m.keyQuestions, '需要向客户提问的关键问题')}
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">🚀 试点落地建议</div>
+        ${listEditor('modules.pilotSuggestions', m.pilotSuggestions, '第一步试点如何切入')}
+      </div>
+
+      <div class="edit-section">
+        <div class="edit-section-title">🚫 禁止承诺（边界）</div>
+        <div class="form-group"><label>技术边界</label>${listEditor('modules.boundaries.technical', m.boundaries.technical, '技术层面不能承诺的事项')}</div>
+        <div class="form-group"><label>交付边界</label>${listEditor('modules.boundaries.delivery', m.boundaries.delivery, '交付层面不能承诺的事项')}</div>
+        <div class="form-group"><label>报价边界</label>${listEditor('modules.boundaries.pricing', m.boundaries.pricing, '报价层面不能承诺的事项')}</div>
+        <div class="form-group"><label>政策边界</label>${listEditor('modules.boundaries.policy', m.boundaries.policy, '政策层面不能承诺的事项')}</div>
+      </div>
+
+      <div style="padding:0 0 16px">
+        <button class="btn btn-primary" style="width:100%" data-action="save-scenario">💾 保存战卡</button>
+      </div>
+    </div>
+    ${renderBottomNav("manage")}
   </div>`;
 }
 
@@ -642,6 +808,7 @@ function renderBottomNav(active) {
     { key: "home",     icon: "🏠", label: "首页",   action: "go-home" },
     { key: "flash",    icon: "🃏", label: "闪卡",   action: "all-flashcards" },
     { key: "quiz",     icon: "📝", label: "测验",   action: "all-quiz" },
+    { key: "manage",   icon: "✏️", label: "管理",   action: "go-manage" },
     { key: "progress", icon: "📊", label: "进度",   action: "progress-view" },
   ];
   return `
@@ -771,6 +938,241 @@ function handleClick(e) {
       break;
     }
 
+    case "go-manage":
+      navigate("manage");
+      break;
+
+    case "add-scenario":
+      State.edit = {
+        scenarioId: null,
+        form: {
+          id: nextScenarioId(),
+          name: "新场景",
+          shortName: "新场景",
+          icon: "📋",
+          color: "#1d4ed8",
+          colorLight: "#dbeafe",
+          theme: "blue",
+          summary: "场景摘要",
+          modules: {
+            tagline: "",
+            targetCustomers: { unitTypes: [], roles: [], decisionMakers: [], users: [], influencers: [] },
+            businessConcerns: [],
+            recommendedSolutions: { platform: [], equipment: [], communication: [], perception: [], services: [] },
+            firstVisitScript: "",
+            keyQuestions: [],
+            pilotSuggestions: [],
+            boundaries: { technical: [], delivery: [], pricing: [], policy: [] }
+          }
+        }
+      };
+      navigate("scenario-edit");
+      break;
+
+    case "edit-scenario": {
+      const sid = parseInt(target.dataset.scenarioId);
+      const scenario = getScenarios().find(s => s.id === sid);
+      if (!scenario) break;
+      State.edit = {
+        scenarioId: sid,
+        form: JSON.parse(JSON.stringify(scenario))
+      };
+      navigate("scenario-edit");
+      break;
+    }
+
+    case "delete-scenario": {
+      const sid = parseInt(target.dataset.scenarioId);
+      const s = getScenarios().find(sc => sc.id === sid);
+      if (!s) break;
+      if (confirm(`确定删除「${s.name}」吗？${isBuiltInScenario(sid) ? '（内置场景可重置恢复）' : ''}`)) {
+        deleteScenario(sid);
+        render();
+      }
+      break;
+    }
+
+    case "save-scenario": {
+      readEditForm();
+      const form = State.edit.form;
+      if (!form.name.trim()) { alert('请填写场景名称'); break; }
+      saveScenario(form);
+      State.edit = { scenarioId: null, form: null };
+      navigate("manage");
+      break;
+    }
+
+    case "list-add": {
+      readEditForm();
+      const path = target.dataset.path;
+      const arr = getNestedValue(State.edit.form, path);
+      if (Array.isArray(arr)) arr.push('');
+      render();
+      setTimeout(() => {
+        const allTextareas = document.querySelectorAll(`[data-path="${path}"]`);
+        if (allTextareas.length) allTextareas[allTextareas.length - 1].focus();
+      }, 50);
+      break;
+    }
+
+    case "list-delete": {
+      readEditForm();
+      const path = target.dataset.path;
+      const idx = parseInt(target.dataset.index);
+      const arr = getNestedValue(State.edit.form, path);
+      if (Array.isArray(arr)) arr.splice(idx, 1);
+      render();
+      break;
+    }
+
+    case "pick-icon": {
+      State.edit.form.icon = target.dataset.icon;
+      const hiddenIcon = document.querySelector('[data-path="icon"]');
+      if (hiddenIcon) hiddenIcon.value = target.dataset.icon;
+      document.querySelectorAll('.icon-opt').forEach(b => b.classList.toggle('selected', b.dataset.icon === target.dataset.icon));
+      break;
+    }
+
+    case "pick-color": {
+      const color = target.dataset.color;
+      const light = target.dataset.light;
+      const theme = target.dataset.theme;
+      State.edit.form.color = color;
+      State.edit.form.colorLight = light;
+      State.edit.form.theme = theme;
+      const hColor = document.querySelector('[data-path="color"]');
+      const hLight = document.querySelector('[data-path="colorLight"]');
+      const hTheme = document.querySelector('[data-path="theme"]');
+      if (hColor) hColor.value = color;
+      if (hLight) hLight.value = light;
+      if (hTheme) hTheme.value = theme;
+      document.querySelectorAll('.color-opt').forEach(b => b.classList.toggle('selected', b.dataset.color === color));
+      break;
+    }
+
+    case "manage-reset-all":
+      if (confirm('确定重置所有自定义数据（包括自定义场景和对内置场景的修改）？此操作不可恢复。')) {
+        localStorage.removeItem('slc_custom');
+        localStorage.removeItem('slc_modified');
+        localStorage.removeItem('slc_deleted');
+        navigate("manage");
+      }
+      break;
+
+    case "go-manage":
+      navigate("manage");
+      break;
+
+    case "add-scenario":
+      State.edit = {
+        scenarioId: null,
+        form: {
+          id: nextScenarioId(),
+          name: "新场景",
+          shortName: "新场景",
+          icon: "📋",
+          color: "#1d4ed8",
+          colorLight: "#dbeafe",
+          theme: "blue",
+          summary: "场景摘要",
+          modules: {
+            tagline: "",
+            targetCustomers: { unitTypes: [], roles: [], decisionMakers: [], users: [], influencers: [] },
+            businessConcerns: [],
+            recommendedSolutions: { platform: [], equipment: [], communication: [], perception: [], services: [] },
+            firstVisitScript: "",
+            keyQuestions: [],
+            pilotSuggestions: [],
+            boundaries: { technical: [], delivery: [], pricing: [], policy: [] }
+          }
+        }
+      };
+      navigate("scenario-edit");
+      break;
+
+    case "edit-scenario": {
+      const sid = parseInt(target.dataset.scenarioId);
+      const scen = getScenarios().find(s => s.id === sid);
+      if (!scen) break;
+      State.edit = { scenarioId: sid, form: JSON.parse(JSON.stringify(scen)) };
+      navigate("scenario-edit");
+      break;
+    }
+
+    case "delete-scenario": {
+      const sid = parseInt(target.dataset.scenarioId);
+      const scen = getScenarios().find(s => s.id === sid);
+      if (!scen) break;
+      if (confirm(`确定删除「${scen.name}」吗？${isBuiltInScenario(sid) ? '（内置场景可通过重置自定义数据恢复）' : ''}`)) {
+        deleteScenario(sid);
+        render();
+      }
+      break;
+    }
+
+    case "save-scenario": {
+      readEditForm();
+      const form = State.edit.form;
+      if (!form || !form.name.trim()) { alert('请填写场景名称'); break; }
+      saveScenario(form);
+      State.edit = { scenarioId: null, form: null };
+      navigate("manage");
+      break;
+    }
+
+    case "list-add": {
+      readEditForm();
+      const path = target.dataset.path;
+      const arr = getNestedValue(State.edit.form, path);
+      if (Array.isArray(arr)) arr.push('');
+      render();
+      setTimeout(() => {
+        const all = document.querySelectorAll(`[data-path="${path}"]`);
+        if (all.length) all[all.length - 1].focus();
+      }, 50);
+      break;
+    }
+
+    case "list-delete": {
+      readEditForm();
+      const path = target.dataset.path;
+      const idx = parseInt(target.dataset.index);
+      const arr = getNestedValue(State.edit.form, path);
+      if (Array.isArray(arr)) arr.splice(idx, 1);
+      render();
+      break;
+    }
+
+    case "pick-icon":
+      State.edit.form.icon = target.dataset.icon;
+      document.querySelectorAll('.icon-opt').forEach(b => b.classList.toggle('selected', b.dataset.icon === target.dataset.icon));
+      document.querySelector('[data-path="icon"]') && (document.querySelector('[data-path="icon"]').value = target.dataset.icon);
+      break;
+
+    case "pick-color": {
+      const { color, light, theme } = target.dataset;
+      State.edit.form.color = color;
+      State.edit.form.colorLight = light;
+      State.edit.form.theme = theme;
+      document.querySelectorAll('.color-opt').forEach(b => b.classList.toggle('selected', b.dataset.color === color));
+      const hc = document.querySelector('[data-path="color"]');
+      const hl = document.querySelector('[data-path="colorLight"]');
+      const ht = document.querySelector('[data-path="theme"]');
+      if (hc) hc.value = color;
+      if (hl) hl.value = light;
+      if (ht) ht.value = theme;
+      break;
+    }
+
+    case "manage-reset-all":
+      if (confirm('确定重置所有自定义数据？（自定义场景和对内置场景的修改将全部清除，此操作不可恢复）')) {
+        localStorage.removeItem('slc_custom');
+        localStorage.removeItem('slc_modified');
+        localStorage.removeItem('slc_deleted');
+        navigate("manage");
+      }
+      break;
+
     case "reset-progress":
       if (confirm("确定重置所有学习进度吗？")) {
         State.progress = {};
@@ -796,10 +1198,10 @@ function handleClick(e) {
 function startFlashcards(scenarioId) {
   let cards;
   if (scenarioId) {
-    const scenario = SCENARIOS.find(s => s.id === scenarioId);
+    const scenario = getScenarios().find(s => s.id === scenarioId);
     cards = generateFlashcards(scenario);
   } else {
-    cards = SCENARIOS.flatMap(s => generateFlashcards(s));
+    cards = getScenarios().flatMap(s => generateFlashcards(s));
     cards = shuffle(cards);
   }
   State.flashcard = {
@@ -828,10 +1230,10 @@ function advanceFlashcard() {
 function startQuiz(scenarioId) {
   let questions;
   if (scenarioId) {
-    const scenario = SCENARIOS.find(s => s.id === scenarioId);
+    const scenario = getScenarios().find(s => s.id === scenarioId);
     questions = generateQuizQuestions(scenario);
   } else {
-    questions = SCENARIOS.flatMap(s => generateQuizQuestions(s));
+    questions = getScenarios().flatMap(s => generateQuizQuestions(s));
     questions = shuffle(questions).slice(0, 12);
   }
   State.quiz = {
@@ -842,6 +1244,38 @@ function startQuiz(scenarioId) {
     submitted: false,
   };
   navigate("quiz");
+}
+
+// ===== Edit Form Reader =====
+function readEditForm() {
+  if (!State.edit.form) return;
+  document.querySelectorAll('[data-path]').forEach(el => {
+    if (el.type === 'hidden') return; // hidden inputs managed by click handlers
+    const path = el.dataset.path;
+    const value = el.value;
+    if (el.dataset.index !== undefined) {
+      const arr = getNestedValue(State.edit.form, path);
+      if (arr && Array.isArray(arr)) arr[parseInt(el.dataset.index)] = value;
+    } else {
+      setNestedValue(State.edit.form, path, value);
+    }
+  });
+}
+
+// ===== Edit Form Reader =====
+function readEditForm() {
+  if (!State.edit.form) return;
+  document.querySelectorAll('[data-path]').forEach(el => {
+    if (el.type === 'hidden') return;
+    const path = el.dataset.path;
+    const value = el.value;
+    if (el.dataset.index !== undefined) {
+      const arr = getNestedValue(State.edit.form, path);
+      if (arr && Array.isArray(arr)) arr[parseInt(el.dataset.index)] = value;
+    } else {
+      setNestedValue(State.edit.form, path, value);
+    }
+  });
 }
 
 // ===== Init =====
