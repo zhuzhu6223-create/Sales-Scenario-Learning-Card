@@ -717,6 +717,80 @@ body {
 .solution-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .solution-tag { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: var(--card); color: var(--text-2); border: 1px solid var(--border); }
 
+/* ===== Wrong Bank ===== */
+.qa-disabled { opacity: 0.45; cursor: not-allowed; }
+
+.wrong-bank-tip {
+  background: var(--danger-bg);
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--danger);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.wrong-bank-tip.correct {
+  background: var(--success-bg);
+  border-color: #6ee7b7;
+  color: var(--success);
+}
+
+.wrong-bank-entry {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.wrong-bank-entry-left { display: flex; align-items: baseline; gap: 6px; }
+.wrong-bank-entry-count { font-size: 32px; font-weight: 800; color: var(--danger); line-height: 1; }
+.wrong-bank-entry-label { font-size: 13px; color: var(--text-2); }
+
+.wrong-bank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.wrong-bank-total { font-size: 14px; color: var(--text-2); }
+.wrong-bank-clear {
+  font-size: 12px;
+  color: var(--danger);
+  background: none;
+  border: 1px solid var(--danger);
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.wrong-bank-group {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.wrong-bank-group-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  padding: 10px 14px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.wrong-bank-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.wrong-bank-item:last-child { border-bottom: none; }
+.wrong-bank-q { font-size: 13px; color: var(--text); margin-bottom: 6px; line-height: 1.5; }
+.wrong-bank-ans { font-size: 12px; color: var(--success); font-weight: 500; }
+
 /* ===== Utility ===== */
 .mt-4 { margin-top: 4px; }
 .mt-8 { margin-top: 8px; }

@@ -17,8 +17,10 @@ const State = {
     index: 0,
     answers: [],
     submitted: false,
+    isWrongBankMode: false,
   },
   progress: loadProgress(),
+  wrongBank: loadWrongBank(),
 };
 
 // ===== Progress Storage =====
@@ -51,6 +53,25 @@ function getOverallProgress() {
   return { total, mastered, pct: total > 0 ? Math.round((mastered / total) * 100) : 0 };
 }
 
+// ===== Wrong Bank Storage =====
+function loadWrongBank() {
+  try {
+    return JSON.parse(localStorage.getItem("slc_wrong_bank") || "[]");
+  } catch { return []; }
+}
+function saveWrongBank() {
+  localStorage.setItem("slc_wrong_bank", JSON.stringify(State.wrongBank));
+}
+function addToWrongBank(question) {
+  State.wrongBank = State.wrongBank.filter(q => q.id !== question.id);
+  State.wrongBank.push({ ...question, addedAt: Date.now() });
+  saveWrongBank();
+}
+function removeFromWrongBank(questionId) {
+  State.wrongBank = State.wrongBank.filter(q => q.id !== questionId);
+  saveWrongBank();
+}
+
 // ===== Router =====
 function navigate(view, params = {}) {
   State.currentView = view;
@@ -70,6 +91,7 @@ function render() {
     case "quiz":              app.innerHTML = renderQuiz(); break;
     case "quiz-result":       app.innerHTML = renderQuizResult(); break;
     case "progress":          app.innerHTML = renderProgress(); break;
+    case "wrong-bank":        app.innerHTML = renderWrongBank(); break;
     case "mode-select":       app.innerHTML = renderModeSelect(); break;
     default:                  app.innerHTML = renderHome();
   }
@@ -79,6 +101,7 @@ function render() {
 // ===== Home Screen =====
 function renderHome() {
   const overall = getOverallProgress();
+  const wrongCount = State.wrongBank.length;
   return `
   <div class="app-shell">
     ${renderHeader({ title: "销售场景战卡", subtitle: "碎片时间，持续成长", showBack: false })}
@@ -130,11 +153,11 @@ function renderHome() {
             <div class="qa-desc">六大场景开场话术</div>
           </div>
         </button>
-        <button class="quick-action-btn" data-action="progress-view">
-          <span class="qa-icon">📊</span>
+        <button class="quick-action-btn ${wrongCount === 0 ? 'qa-disabled' : ''}" data-action="wrong-bank-quiz" ${wrongCount === 0 ? 'disabled' : ''}>
+          <span class="qa-icon">❌</span>
           <div class="qa-text">
-            <div class="qa-title">学习进度</div>
-            <div class="qa-desc">${overall.pct}% 完成</div>
+            <div class="qa-title">错题重练</div>
+            <div class="qa-desc">${wrongCount > 0 ? `${wrongCount} 道错题待攻克` : '暂无错题'}</div>
           </div>
         </button>
       </div>
@@ -474,14 +497,16 @@ function renderQuiz() {
   const total = quiz.questions.length;
   const pct = Math.round(((quiz.index) / total) * 100);
   const answer = quiz.answers[quiz.index];
-  const scenarioName = quiz.scenarioId
-    ? SCENARIOS.find(s => s.id === quiz.scenarioId)?.name
-    : "综合测验";
+  const scenarioName = quiz.isWrongBankMode
+    ? "错题重练"
+    : quiz.scenarioId
+      ? SCENARIOS.find(s => s.id === quiz.scenarioId)?.name
+      : "综合测验";
 
   return `
   <div class="app-shell">
     ${renderHeader({
-      title: "知识测验",
+      title: quiz.isWrongBankMode ? "错题重练" : "知识测验",
       subtitle: `${scenarioName} · ${quiz.index + 1}/${total}`,
       showBack: true,
       backView: quiz.scenarioId ? "scenario" : "home",
@@ -489,11 +514,11 @@ function renderQuiz() {
 
     <div class="main-content quiz-screen has-bottom-nav">
       <div class="fc-progress-bar" style="margin-bottom:16px">
-        <div class="fc-progress-fill" style="width:${pct}%;height:6px;background:var(--primary-light);border-radius:3px"></div>
+        <div class="fc-progress-fill" style="width:${pct}%;height:6px;background:${quiz.isWrongBankMode ? 'var(--danger)' : 'var(--primary-light)'};border-radius:3px"></div>
       </div>
 
       <div class="quiz-question-card">
-        <div class="quiz-q-label">第 ${quiz.index + 1} 题 / 共 ${total} 题</div>
+        <div class="quiz-q-label">第 ${quiz.index + 1} 题 / 共 ${total} 题${quiz.isWrongBankMode ? ' · ❌ 错题模式' : ''}</div>
         <div class="quiz-q-text">${q.question}</div>
       </div>
 
@@ -532,15 +557,18 @@ function renderQuizResult() {
   const correct = quiz.answers.filter(a => a && a.correct).length;
   const total = quiz.answers.length;
   const pct = Math.round((correct / total) * 100);
+  const wrongCount = State.wrongBank.length;
 
   let title, desc;
   if (pct >= 90) { title = "太棒了！🎉"; desc = "你对这个场景掌握得非常好，可以挑战其他场景了！"; }
   else if (pct >= 70) { title = "不错！继续加油 💪"; desc = "基础掌握良好，建议重点复习答错的题目，再做一次巩固。"; }
   else { title = "加油！多练几次 📚"; desc = "建议先重新浏览战卡内容，再来做测验，相信会有提升！"; }
 
+  const wrongThisRound = quiz.answers.filter(a => a && !a.correct).length;
+
   return `
   <div class="app-shell">
-    ${renderHeader({ title: "测验结果", showBack: false })}
+    ${renderHeader({ title: quiz.isWrongBankMode ? "错题重练结果" : "测验结果", showBack: false })}
     <div class="main-content result-screen has-bottom-nav">
       <div class="result-score-ring" style="--score-pct:${pct * 3.6}deg">
         <div class="result-score-inner">
@@ -551,8 +579,21 @@ function renderQuizResult() {
       <div class="result-title">${title}</div>
       <div class="result-desc">${correct}/${total} 题答对<br>${desc}</div>
 
+      ${wrongThisRound > 0 ? `
+        <div class="wrong-bank-tip">
+          ❌ 本次答错 ${wrongThisRound} 题，已自动加入错题库（当前共 ${wrongCount} 题）
+        </div>
+      ` : `
+        <div class="wrong-bank-tip correct">
+          ✅ 本次全部答对${quiz.isWrongBankMode ? '，错题已从题库移除' : ''}！
+        </div>
+      `}
+
       <div class="module-cta" style="flex-direction:column;gap:10px">
-        <button class="btn btn-primary" data-action="retry-quiz">🔁 再做一次</button>
+        ${wrongCount > 0 ? `
+          <button class="btn btn-primary" data-action="wrong-bank-quiz">❌ 错题重练（${wrongCount} 题）</button>
+        ` : ""}
+        <button class="btn btn-secondary" data-action="retry-quiz">🔁 再做一次</button>
         ${quiz.scenarioId ? `
           <button class="btn btn-secondary" data-action="back-to-scenario">← 返回战卡</button>
         ` : `
@@ -564,9 +605,60 @@ function renderQuizResult() {
   </div>`;
 }
 
+// ===== Wrong Bank Screen =====
+function renderWrongBank() {
+  const bank = State.wrongBank;
+
+  const grouped = {};
+  bank.forEach(q => {
+    const scenario = SCENARIOS.find(s => s.id === q.scenarioId);
+    const name = scenario ? scenario.name : "未知场景";
+    const icon = scenario ? scenario.icon : "❓";
+    if (!grouped[name]) grouped[name] = { icon, questions: [] };
+    grouped[name].questions.push(q);
+  });
+
+  return `
+  <div class="app-shell">
+    ${renderHeader({ title: "错题库", showBack: true, backView: "progress" })}
+    <div class="main-content has-bottom-nav">
+
+      ${bank.length === 0 ? `
+        <div class="empty-state" style="padding-top:60px">
+          <div class="empty-icon">🎉</div>
+          <div class="empty-text">错题库是空的<br>继续保持，全部答对！</div>
+        </div>
+      ` : `
+        <div class="wrong-bank-header">
+          <div class="wrong-bank-total">共 <strong>${bank.length}</strong> 道错题</div>
+          <button class="wrong-bank-clear" data-action="clear-wrong-bank">清空错题库</button>
+        </div>
+
+        <button class="btn btn-primary" style="margin-bottom:16px" data-action="wrong-bank-quiz">
+          ❌ 开始错题重练（${bank.length} 题）
+        </button>
+
+        ${Object.entries(grouped).map(([name, { icon, questions }]) => `
+          <div class="wrong-bank-group">
+            <div class="wrong-bank-group-title">${icon} ${name} · ${questions.length} 题</div>
+            ${questions.map(q => `
+              <div class="wrong-bank-item">
+                <div class="wrong-bank-q">${q.question}</div>
+                <div class="wrong-bank-ans">✅ ${q.options.find(o => o.correct)?.text || ''}</div>
+              </div>
+            `).join("")}
+          </div>
+        `).join("")}
+      `}
+    </div>
+    ${renderBottomNav("progress")}
+  </div>`;
+}
+
 // ===== Progress Screen =====
 function renderProgress() {
   const overall = getOverallProgress();
+  const wrongCount = State.wrongBank.length;
   return `
   <div class="app-shell">
     ${renderHeader({ title: "学习进度", showBack: false })}
@@ -594,8 +686,23 @@ function renderProgress() {
         }).join("")}
       </div>
 
-      <div class="mt-16">
+      <div class="section-title" style="margin-top:20px">❌ 错题库</div>
+      <div class="wrong-bank-entry" data-action="view-wrong-bank">
+        <div class="wrong-bank-entry-left">
+          <div class="wrong-bank-entry-count">${wrongCount}</div>
+          <div class="wrong-bank-entry-label">道错题待攻克</div>
+        </div>
+        <div class="wrong-bank-entry-right">
+          ${wrongCount > 0
+            ? `<button class="btn btn-primary" style="padding:10px 16px;font-size:13px" data-action="wrong-bank-quiz">立即重练 →</button>`
+            : `<span style="color:var(--success);font-weight:600;font-size:13px">✅ 全部掌握</span>`
+          }
+        </div>
+      </div>
+
+      <div class="mt-16" style="display:flex;flex-direction:column;gap:10px">
         <button class="btn btn-secondary" style="width:100%" data-action="reset-progress">重置学习进度</button>
+        ${wrongCount > 0 ? `<button class="btn btn-secondary" style="width:100%;color:var(--danger);border-color:var(--danger)" data-action="clear-wrong-bank">清空错题库</button>` : ""}
       </div>
     </div>
     ${renderBottomNav("progress")}
@@ -746,8 +853,16 @@ function handleClick(e) {
     case "quiz-answer": {
       if (State.quiz.answers[State.quiz.index]) break;
       const optIdx = parseInt(target.dataset.index);
-      const isCorrect = State.quiz.questions[State.quiz.index].options[optIdx].correct;
+      const currentQ = State.quiz.questions[State.quiz.index];
+      const isCorrect = currentQ.options[optIdx].correct;
       State.quiz.answers[State.quiz.index] = { selectedIndex: optIdx, correct: isCorrect };
+
+      if (!isCorrect) {
+        addToWrongBank(currentQ);
+      } else if (State.quiz.isWrongBankMode) {
+        removeFromWrongBank(currentQ.id);
+      }
+
       render();
       break;
     }
@@ -762,7 +877,11 @@ function handleClick(e) {
       break;
 
     case "retry-quiz":
-      startQuiz(State.quiz.scenarioId);
+      if (State.quiz.isWrongBankMode) {
+        startWrongBankQuiz();
+      } else {
+        startQuiz(State.quiz.scenarioId);
+      }
       break;
 
     case "back-to-scenario": {
@@ -770,6 +889,22 @@ function handleClick(e) {
       navigate("scenario", { currentScenarioId: sid, currentModuleKey: "tagline" });
       break;
     }
+
+    case "wrong-bank-quiz":
+      startWrongBankQuiz();
+      break;
+
+    case "view-wrong-bank":
+      navigate("wrong-bank");
+      break;
+
+    case "clear-wrong-bank":
+      if (confirm(`确定清空全部 ${State.wrongBank.length} 道错题吗？`)) {
+        State.wrongBank = [];
+        saveWrongBank();
+        render();
+      }
+      break;
 
     case "reset-progress":
       if (confirm("确定重置所有学习进度吗？")) {
@@ -780,7 +915,6 @@ function handleClick(e) {
       break;
 
     default:
-      // Module tab switch or scenario card click (no data-action)
       if (target.dataset.module) {
         State.currentModuleKey = target.dataset.module;
         render();
@@ -840,6 +974,24 @@ function startQuiz(scenarioId) {
     index: 0,
     answers: new Array(questions.length).fill(null),
     submitted: false,
+    isWrongBankMode: false,
+  };
+  navigate("quiz");
+}
+
+function startWrongBankQuiz() {
+  if (State.wrongBank.length === 0) return;
+  const questions = State.wrongBank.map(q => ({
+    ...q,
+    options: shuffle([...q.options]),
+  }));
+  State.quiz = {
+    scenarioId: null,
+    questions: shuffle(questions),
+    index: 0,
+    answers: new Array(questions.length).fill(null),
+    submitted: false,
+    isWrongBankMode: true,
   };
   navigate("quiz");
 }
